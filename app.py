@@ -1,12 +1,20 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Response
 from agents.supervisor import SupervisorAgent
+import requests
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
-def Home():
-    return render_template('index.html')
+API_KEY = os.getenv("hotel_api_key")
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
 
 @app.route("/plan", methods=["POST"])
 def plan_trip():
@@ -31,5 +39,24 @@ def plan_trip():
     )
 
 
+@app.route("/hotel-photo")
+def hotel_photo():
+
+    photo = request.args.get("photo")
+
+    url = f"https://places.googleapis.com/v1/{photo}/media?maxHeightPx=300&key={API_KEY}"
+
+    r = requests.get(url, allow_redirects=True)
+
+    print("Status:", r.status_code)
+    print("Headers:", r.headers)
+    print("Body:", r.text[:300])
+
+    return Response(
+        r.content,
+        content_type=r.headers.get("Content-Type", "image/jpeg")
+    )
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(debug=True, port=8000)

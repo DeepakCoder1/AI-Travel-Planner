@@ -1,4 +1,5 @@
 from agents.planner_agent import Planneragent
+from agents.hotel_agent import HotelAgent
 
 
 class SupervisorAgent:
@@ -13,6 +14,7 @@ class SupervisorAgent:
 
     def __init__(self):
         self.planner = Planneragent()
+        self.hotel = HotelAgent()
 
     def plan_trip(self, destination, days, budget, travel_style):
 
@@ -31,7 +33,18 @@ class SupervisorAgent:
             budget,
             travel_style
         )
+        hotels = self.hotel.get_hotels(destination)
 
         print("\nPlanner Agent Finished.")
 
-        return itinerary
+        return f"""
+
+================ HOTELS ================
+
+{hotels}
+
+================ ITINERARY ================
+
+{itinerary}
+
+"""
